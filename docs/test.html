@@ -1,0 +1,50 @@
+
+
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+<body>
+    手写一个简单双向绑定<br/>
+    <input type="text" id="model"><br/>
+    <div id="modelText"></div>
+</body>
+<script>
+    var user = {
+      name: 'liuhao'
+    };
+    var defaultName = 'liuhao'
+
+    var input = document.getElementById("model");
+    var text = document.getElementById("modelText");
+
+    input.value = user.name;
+    text.textContent = user.name;
+
+    // 数据到视图 model => view
+    Object.defineProperty(user,"name",{
+      get:function(){
+        console.log('获取user')
+      },
+      set:function(val){
+        console.log('修改user')
+       // input.value = val;
+        text.textContent = val;
+      }
+    })
+
+    // 视图到数据 view => model
+      input.addEventListener('keyup',function(val){
+      user.name = input.value;
+    })
+    // input.addEventListener('input',function(val){
+    //   user.name = input.value;
+    // })
+</script>
+</html>
+<style type="text/css">
+  .box{
+    justify-content: space-around;
+  }
+</style>

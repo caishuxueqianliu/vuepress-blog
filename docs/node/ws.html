@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<boyd>
+下面是重点，复习一下Vuex，即状态管理工具</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul><li>state 存放状态</li><li>mutations state成员操作</li><li>getters 加工state成员给外界</li><li>actions 异步操作</li><li>modules 模块化状态管理</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:image {"id":88,"sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="http://106.14.40.150/wp-content/uploads/2020/11/1F999A1B-9D56-4E1E-90CC-BC0C9641D3BD.jpg" alt="" class="wp-image-88"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph {"backgroundColor":"light-green-cyan"} -->
+<p class="has-background has-light-green-cyan-background-color">state 不用说，存放数据</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code> state: {  
+    token: window.localStorage.getItem('token'), //token
+  },</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph {"backgroundColor":"very-light-gray"} -->
+<p class="has-background has-very-light-gray-background-color">组件中使用方式两种</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>this.$store.state.token</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>  import { mapState } from 'vuex'</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:preformatted -->
+<pre class="wp-block-preformatted">computed: {
+    ...<em>mapState</em>({
+        token: state => state.<em>token</em>,
+    })
+}
+//...<em>mapState</em>({a:'<em>token</em>'}) 其他三种同理 改名</pre>
+<!-- /wp:preformatted -->
+
+<!-- wp:paragraph {"backgroundColor":"light-green-cyan"} -->
+<p class="has-background has-light-green-cyan-background-color">mutations是操作state数据的方法的集合，比如对该数据的修改、增加、删除等等。</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>  mutations: {   
+   editToken (state, token) { //设置参数
+      state.token = token;
+    } 
+  },</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph {"backgroundColor":"very-light-gray"} -->
+<p class="has-background has-very-light-gray-background-color">组件中去调用执行这个方法</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>this.$store.commit('editToken',token) // 方法，参数</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph {"backgroundColor":"very-light-gray"} -->
+<p class="has-background has-very-light-gray-background-color">或者写全</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>this.$store.commit({
+    type:'edit', // mutations 中的方法名
+    payload:{     // 参数
+        age:15,
+        sex:'男'
+    }
+})</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph {"backgroundColor":"very-light-gray"} -->
+<p class="has-background has-very-light-gray-background-color">或者mapMutations方式</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>import { mapMutations } from 'vuex'</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>   methods: {
+      ...mapMutations(&#91;'editToken']) //其他地方调用即可
+    }</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph {"backgroundColor":"pale-pink"} -->
+<p class="has-background has-pale-pink-background-color">注意的是，对于增删state中的成员，为了配合Vue的响应式数据，我们在Mutations的方法中，应当使用Vue提供的方法来进行操作。</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>Vue.set(state,"age",15)   //增
+Vue.delete(state,'age')   //删</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph {"backgroundColor":"light-green-cyan"} -->
+<p class="has-background has-light-green-cyan-background-color">Getters可以对state中的成员加工后传递给外界<br>Getters中的方法有两个默认参数<br>相当于全局computed属性</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul><li>state 当前VueX对象中的状态对象</li><li>getters 当前getters对象，用于将getters下的其他getter拿来用</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>getters:{
+    nameInfo(state){
+        return "姓名:"+state.name
+    },
+    fullInfo(state, getters){
+        return getters.nameInfo+'年龄:'+state.age
+    }  
+}</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph {"backgroundColor":"very-light-gray"} -->
+<p class="has-background has-very-light-gray-background-color">组件中调用两种</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>this.$store.getters.fullInfo</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>import { mapGetters } from 'vuex'
+computed: {
+    ...mapGetters(&#91;'fullInfo']),
+  }</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph {"backgroundColor":"light-green-cyan"} -->
+<p class="has-background has-light-green-cyan-background-color">由于直接在Mutations方法中进行异步操作，将会引起数据失效。所以提供了Actions来专门进行异步操作，最终提交Mutations方法。<br>Actions中的方法有两个默认参数</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul><li><code>context</code>&nbsp;上下文(相当于箭头函数中的this)对象</li><li><code>payload</code>&nbsp;挂载参数</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>actions:{
+    aEdit(context, token){
+        setTimeout(()=>{
+            context.commit('edit',token)
+        },2000)
+    }
+}</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph {"backgroundColor":"very-light-gray"} -->
+<p class="has-background has-very-light-gray-background-color">或者</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>  actions:{  
+recordBaName({commit}, baName) {
+      commit('updataBaName', baName)
+    },
+  async getAddress({commit,state}){
+   const geohash=state.latitude+','+state.longitude
+   const result=await reqAddress(geohash)
+ const address=result.data.data
+ commit('receive_address',{address})
+
+   }
+}</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph {"backgroundColor":"very-light-gray"} -->
+<p class="has-background has-very-light-gray-background-color">组件中调用两种方式</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>this.$store.dispatch('aEdit',{token:'test'})</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>    import { mapActions} from "vuex";
+    methods: {
+        ...mapActions(&#91;'aEdit'])  
+// 相当于this.aEdit({token:'test'})映射为
+// this.$store.dispatch('aEdit',{token:'test'})
+    }</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph {"backgroundColor":"light-green-cyan"} -->
+<p class="has-background has-light-green-cyan-background-color">当项目庞大，状态非常多时，可以采用模块化管理模式。Vuex 允许我们将 store 分割成<strong>模块（module）</strong>。每个模块拥有自己的 state，mutations,getters,actions、甚至是嵌套子模块——从上至下进行同样方式的分割。</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>models:{
+    a:{
+        state:{},
+        getters:{},
+        ....
+    }
+}</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>this.$store.state.a //是models中的a 而不是根state中的a 前者覆盖后者</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>this.$store.commit('editKey')
+this.$store.dispatch('aEditKey')
+//组件中提交会自动执行所有模块内的对应type的方法</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph {"backgroundColor":"light-green-cyan"} -->
+<p class="has-background has-light-green-cyan-background-color">模块中<code>mutations</code>和<code>getters</code>中的方法接受的第一个参数是自身局部模块内部的<code>state</code></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>models:{
+    a:{
+        state:{key:5},
+        mutations:{
+            editKey(state){
+                state.key = 9
+            }
+        },
+        ....
+    }
+}</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph {"backgroundColor":"light-green-cyan"} -->
+<p class="has-background has-light-green-cyan-background-color"><code>getters</code>中方法的第三个参数是根节点状态</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>models:{
+    a:{
+        state:{key:5},
+        getters:{
+            getKeyCount(state,getter,rootState){
+                return  rootState.key + state.key
+            }
+        },
+        ....
+    }
+}</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph {"backgroundColor":"light-green-cyan"} -->
+<p class="has-background has-light-green-cyan-background-color"><code>actions</code>中方法获取局部模块状态是<code>context.state</code>,根节点状态是<code>context.rootState</code<!-- wp:paragraph {"backgroundColor":"vivid-green-cyan"} -->
+<p class="has-background has-vivid-green-cyan-background-color">先上一张生命周期图</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":74,"sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="http://106.14.40.150/wp-content/uploads/2020/11/lifecycle-404x1024.png" alt="" class="wp-image-74"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph {"textColor":"very-dark-gray","backgroundColor":"vivid-green-cyan"} -->
+<p class="has-text-color has-background has-very-dark-gray-color has-vivid-green-cyan-background-color">先看看别人总结的:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"textColor":"very-dark-gray","backgroundColor":"very-light-gray"} -->
+<p class="has-text-color has-background has-very-dark-gray-color has-very-light-gray-background-color">beforeCreate:<br>刚刚new Vue()之后，这个时候，数据还没有挂载呢，只是一个空壳 </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"backgroundColor":"very-light-gray"} -->
+<p class="has-background has-very-light-gray-background-color">created:<br>这个时候已经可以使用到数据，也可以更改数据,在这里更改数据不会触发 updated函数 <br>在这里可以在渲染前倒数第二次更改数据的机会，不会触发其他的钩子函数，一般可以在这里做初始数据的获取 <br>接下来开始找实例或者组件对应的模板，编译模板为虚拟dom放入到render函数中准备渲染 </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"backgroundColor":"very-light-gray"} -->
+<p class="has-background has-very-light-gray-background-color">beforeMount：<br>虚拟dom已经创建完成，马上就要渲染,在这里也可以更改数据，不会触发updated 函数<br>在这里可以在渲染前最后一次更改数据的机会，不会触发其他的钩子函数，一般可以在这里做初始数据的获取 <br>接下来开始render，渲染出真实dom </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"backgroundColor":"very-light-gray"} -->
+<p class="has-background has-very-light-gray-background-color">mounted：<br>此时，组件已经出现在页面中，数据、真实dom都已经处理好了,事件都已经挂载好了<br>可以在这里操作真实dom等事情...  </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"backgroundColor":"very-light-gray"} -->
+<p class="has-background has-very-light-gray-background-color">beforeUpdate:<br>重新渲染之前触发 <br>然后vue的虚拟dom机制会重新构建虚拟dom与上一次的虚拟dom树利用diff算法进行对比之后重新渲染 </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"backgroundColor":"very-light-gray"} -->
+<p class="has-background has-very-light-gray-background-color">updated:<br>数据已经更改完成，dom也重新render完成 </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"backgroundColor":"very-light-gray"} -->
+<p class="has-background has-very-light-gray-background-color">beforeDestory:<br>销毁前执行（$destroy方法被调用的时候就会执行）,一般在这里善后:清除计时器、清除非指令绑定的事件等等... </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"backgroundColor":"very-light-gray"} -->
+<p class="has-background has-very-light-gray-background-color">destroyed: <br>组件的数据绑定、监听...都去掉了,只剩下dom空壳，这里也可以善后 </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"backgroundColor":"vivid-green-cyan"} -->
+<p class="has-background has-vivid-green-cyan-background-color">下一步，自己做了些试验，如图，看看输出</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":75,"sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="http://106.14.40.150/wp-content/uploads/2020/11/GW8WPOHMFUWCMT43_XG.png" alt="" class="wp-image-75"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"id":76,"sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="http://106.14.40.150/wp-content/uploads/2020/11/CMJTT5PVF3LSC1SHY.png" alt="" class="wp-image-76"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph {"backgroundColor":"very-light-gray"} -->
+<p class="has-background has-very-light-gray-background-color">首次进入页面，触发4个钩子函数<br>beforeCreate: $el和data都没有<br>create: data已经有了，未渲染 dom，未挂载到页面上<br>beforeMount:  虚拟dom已经创建完成 <br>Mount:  组件已经出现在页面中，数据、真实dom已挂载<br> </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":78,"sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="http://106.14.40.150/wp-content/uploads/2020/11/88713U70__F8DXK@3T.png" alt="" class="wp-image-78"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph {"backgroundColor":"very-light-gray"} -->
+<p class="has-background has-very-light-gray-background-color">接下来更新下data中数据看看，触发<br> beforeUpdate 和 update ，看上去貌似一样，数据和组件都更新了<br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":79,"sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="http://106.14.40.150/wp-content/uploads/2020/11/PJXPM26HGQFV0NTSY_Y.png" alt="" class="wp-image-79"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>最后是beforeDestory和destory ，离开当前页面时触发，试了一下在这两个方法中清除定时器</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":80,"sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="http://106.14.40.150/wp-content/uploads/2020/11/3S8_FQS6Y6L9TC81J-1.png" alt="" class="wp-image-80"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph {"backgroundColor":"vivid-green-cyan"} -->
+<p class="has-background has-vivid-green-cyan-background-color">总结一下几个常用的</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"backgroundColor":"vivid-green-cyan"} -->
+<p class="has-background has-vivid-green-cyan-background-color">created：实例中的data、motheds等已经有了，dom未渲染，页面中组件未挂载</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"backgroundColor":"vivid-green-cyan"} -->
+<p class="has-background has-vivid-green-cyan-background-color">mounted：此时dom已渲染，页面中组件已经挂载</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"backgroundColor":"vivid-green-cyan"} -->
+<p class="has-background has-vivid-green-cyan-background-color"> beforeDestory ： 销毁前执行 ，一般用于清除计时器、清除非指令绑定的事件等等...  </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+      </body>
+</html>
