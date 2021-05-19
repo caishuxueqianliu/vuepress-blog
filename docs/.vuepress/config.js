@@ -51,6 +51,13 @@ module.exports = {
            'vuex.md'
          ]
        }],
+       '/wx/': [{
+         title: '小程序笔记',
+         collapsable: true,
+         children: [
+           'components.md'
+         ]
+       }],
         '/react/': [{
          title: 'react笔记',
          collapsable: true,
@@ -181,6 +188,7 @@ module.exports = {
       { text: 'Css', link: '/css/flex.md' },
       { text: 'Vue', link: '/vue/slot.md' },
       { text: 'React', link: '/react/redux.md' },
+      { text: '小程序', link: '/wx/components.md' },
       { text: 'Node', link: '/node/mysql.md' },
       // { text: 'Others', link: '/vue/slot.md' },
       // {
